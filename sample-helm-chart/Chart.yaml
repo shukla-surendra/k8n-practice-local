@@ -1,0 +1,4 @@
+apiVersion: v2
+name: my-nginx
+version: 0.1.0
+description: A simple Nginx Helm chart for Kubernetes

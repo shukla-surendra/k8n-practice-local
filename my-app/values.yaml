@@ -1,0 +1,31 @@
+# values.yaml — defaults (used when no env-specific file is passed)
+# Override these per environment with: helm install -f values-dev.yaml
+
+env: dev
+
+image:
+  repository: nginx
+  tag: alpine
+  pullPolicy: IfNotPresent
+
+# How many pod copies to run
+replicaCount: 1
+
+# CPU and memory limits per pod
+resources:
+  requests:
+    cpu: 50m       # 50 millicores = 0.05 of a CPU
+    memory: 64Mi
+  limits:
+    cpu: 100m
+    memory: 128Mi
+
+service:
+  port: 80
+
+# Horizontal Pod Autoscaler — scales replicas based on CPU load
+autoscaling:
+  enabled: false
+  minReplicas: 1
+  maxReplicas: 2
+  targetCPUPercent: 70

@@ -1,0 +1,15 @@
+# QA — slightly more than dev, still no autoscaling
+env: qa
+
+replicaCount: 2
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 128Mi
+  limits:
+    cpu: 200m
+    memory: 256Mi
+
+autoscaling:
+  enabled: false
