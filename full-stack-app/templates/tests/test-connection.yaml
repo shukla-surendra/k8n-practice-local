@@ -1,0 +1,25 @@
+# Run with: helm test <release> -n <namespace>
+apiVersion: v1
+kind: Pod
+metadata:
+  name: {{ .Release.Name }}-test-connection
+  labels:
+    app.kubernetes.io/part-of: full-stack-app
+  annotations:
+    helm.sh/hook: test
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  restartPolicy: Never
+  containers:
+    - name: curl
+      image: curlimages/curl:8.10.1
+      command:
+        - sh
+        - -c
+        - |
+          set -e
+          echo "Checking frontend..."
+          curl -sf -o /dev/null -w "frontend: HTTP %{http_code}\n" http://{{ .Release.Name }}-frontend:{{ .Values.frontend.service.port }}/
+          echo "Checking backend..."
+          curl -sf -o /dev/null -w "backend: HTTP %{http_code}\n" http://{{ .Release.Name }}-backend:{{ .Values.backend.service.port }}/
+          echo "All checks passed."

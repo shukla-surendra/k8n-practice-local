@@ -1,0 +1,31 @@
+# Defaults for the database subchart.
+# When installed as part of the full-stack-app umbrella chart, these are
+# overridden by the "database:" section of the parent's values.yaml.
+
+image:
+  repository: postgres
+  tag: "16-alpine"
+  pullPolicy: IfNotPresent
+
+auth:
+  user: appuser
+  database: appdb
+  # Leave blank to auto-generate and persist across upgrades (see secret.yaml).
+  password: ""
+
+service:
+  port: 5432
+
+resources:
+  requests:
+    cpu: 50m
+    memory: 128Mi
+  limits:
+    cpu: 250m
+    memory: 256Mi
+
+persistence:
+  enabled: true
+  size: 512Mi
+  # Empty = use the cluster's default StorageClass (minikube: "standard").
+  storageClassName: ""

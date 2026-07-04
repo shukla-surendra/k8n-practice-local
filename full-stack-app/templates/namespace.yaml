@@ -1,0 +1,11 @@
+{{- if .Values.namespace.create }}
+# Only created when installing with `--namespace <ns> --create-namespace`
+# is *not* used — set namespace.create=false if you'd rather let Helm/kubectl
+# manage the namespace lifecycle themselves.
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/part-of: full-stack-app
+{{- end }}

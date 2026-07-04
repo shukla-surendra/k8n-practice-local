@@ -1,0 +1,17 @@
+{{- if .Values.resourceQuota.enabled }}
+# Caps total compute this release's namespace may consume — prevents one
+# release from starving a shared local cluster.
+apiVersion: v1
+kind: ResourceQuota
+metadata:
+  name: {{ .Release.Name }}-quota
+  labels:
+    app.kubernetes.io/part-of: full-stack-app
+spec:
+  hard:
+    requests.cpu: {{ .Values.resourceQuota.requestsCpu | quote }}
+    requests.memory: {{ .Values.resourceQuota.requestsMemory | quote }}
+    limits.cpu: {{ .Values.resourceQuota.limitsCpu | quote }}
+    limits.memory: {{ .Values.resourceQuota.limitsMemory | quote }}
+    pods: {{ .Values.resourceQuota.maxPods | quote }}
+{{- end }}

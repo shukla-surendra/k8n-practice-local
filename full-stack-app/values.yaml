@@ -1,0 +1,70 @@
+# Root values for the full-stack-app umbrella chart.
+#
+# Top-level keys named after a subchart ("frontend:", "backend:", "database:")
+# are passed down to that subchart automatically by Helm — no wiring needed.
+# Everything else here (ingress, networkPolicy, resourceQuota, ...) drives
+# the cross-cutting templates in this chart's own templates/ directory.
+
+namespace:
+  # Leave false if you create the namespace yourself with
+  # `helm install ... --create-namespace` (recommended — see README).
+  # Set true only if you are NOT using --create-namespace.
+  create: false
+
+ingress:
+  enabled: true
+  className: nginx
+  host: fullstack.local
+  annotations: {}
+
+networkPolicy:
+  enabled: true
+
+resourceQuota:
+  enabled: true
+  requestsCpu: "1"
+  requestsMemory: 1Gi
+  limitsCpu: "2"
+  limitsMemory: 2Gi
+  maxPods: "20"
+
+limitRange:
+  enabled: true
+
+migrationJob:
+  enabled: true
+
+backupCronJob:
+  enabled: true
+  schedule: "0 2 * * *" # nightly at 02:00; trigger manually for testing (see README)
+
+# --- subchart overrides ---
+# (each subchart's own values.yaml documents every available key)
+
+frontend:
+  enabled: true
+  replicaCount: 2
+  autoscaling:
+    enabled: true
+  apiPath: /api
+
+backend:
+  enabled: true
+  replicaCount: 2
+  autoscaling:
+    enabled: true
+  database:
+    # host left blank on purpose: the backend chart computes "<release>-database"
+    # itself so it can never drift out of sync with the database Service name.
+    port: 5432
+    name: appdb
+    user: appuser
+
+database:
+  enabled: true
+  auth:
+    user: appuser
+    database: appdb
+  persistence:
+    enabled: true
+    size: 512Mi

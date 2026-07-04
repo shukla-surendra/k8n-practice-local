@@ -1,0 +1,62 @@
+{{- if .Values.migrationJob.enabled }}
+# Runs once after a fresh install (DB StatefulSet already applied by then)
+# and again before every upgrade, to apply schema migrations ahead of any
+# new backend pods rolling out.
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}-db-migrate-{{ .Release.Revision }}
+  labels:
+    app.kubernetes.io/name: db-job
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/part-of: full-stack-app
+  annotations:
+    helm.sh/hook: post-install,pre-upgrade
+    helm.sh/hook-weight: "0"
+    helm.sh/hook-delete-policy: before-hook-creation,hook-succeeded
+spec:
+  backoffLimit: 3
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: db-job
+        app.kubernetes.io/instance: {{ .Release.Name }}
+    spec:
+      restartPolicy: Never
+      containers:
+        - name: migrate
+          image: "{{ .Values.database.image.repository }}:{{ .Values.database.image.tag }}"
+          env:
+            - name: PGHOST
+              value: {{ .Release.Name }}-database
+            - name: PGPORT
+              value: {{ .Values.database.service.port | quote }}
+            - name: PGUSER
+              value: {{ .Values.database.auth.user | quote }}
+            - name: PGDATABASE
+              value: {{ .Values.database.auth.database | quote }}
+            - name: PGPASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: {{ .Release.Name }}-database
+                  key: postgres-password
+          command:
+            - sh
+            - -c
+            - |
+              set -e
+              echo "Waiting for database to accept connections..."
+              for i in $(seq 1 30); do
+                pg_isready -q && break
+                echo "  not ready yet ($i/30)..."
+                sleep 2
+              done
+              pg_isready
+              echo "Applying migration: seed demo_items if empty"
+              psql -v ON_ERROR_STOP=1 <<'SQL'
+              INSERT INTO demo_items (name)
+              SELECT 'hello-from-migration-job'
+              WHERE NOT EXISTS (SELECT 1 FROM demo_items);
+              SQL
+              echo "Migration complete."
+{{- end }}

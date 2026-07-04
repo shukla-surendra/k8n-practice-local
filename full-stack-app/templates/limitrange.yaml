@@ -1,0 +1,26 @@
+{{- if .Values.limitRange.enabled }}
+# Fills in sane default requests/limits for any container in this namespace
+# that doesn't specify its own — a safety net, not something our own
+# Deployments rely on (they all set explicit resources).
+apiVersion: v1
+kind: LimitRange
+metadata:
+  name: {{ .Release.Name }}-limits
+  labels:
+    app.kubernetes.io/part-of: full-stack-app
+spec:
+  limits:
+    - type: Container
+      defaultRequest:
+        cpu: 25m
+        memory: 32Mi
+      default:
+        cpu: 250m
+        memory: 256Mi
+      max:
+        cpu: 1
+        memory: 512Mi
+      min:
+        cpu: 10m
+        memory: 16Mi
+{{- end }}

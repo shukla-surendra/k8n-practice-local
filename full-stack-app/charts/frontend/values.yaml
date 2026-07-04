@@ -1,0 +1,38 @@
+# Defaults for the frontend subchart.
+# When installed as part of the full-stack-app umbrella chart, these are
+# overridden by the "frontend:" section of the parent's values.yaml.
+
+replicaCount: 2
+
+image:
+  repository: nginx
+  tag: alpine
+  pullPolicy: IfNotPresent
+
+service:
+  port: 80
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUPercent: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+serviceAccount:
+  create: true
+  name: ""
+
+# The API base path the page links to — must match backend's ingress path.
+apiPath: /api

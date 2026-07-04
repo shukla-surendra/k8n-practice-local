@@ -1,0 +1,17 @@
+# Headless Service: gives the StatefulSet's pod a stable DNS name
+# (<pod>.<service>.<namespace>.svc.cluster.local) instead of load-balancing.
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "database.fullname" . }}
+  labels:
+    {{- include "database.labels" . | nindent 4 }}
+spec:
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: database
+    app.kubernetes.io/instance: {{ .Release.Name }}
+  ports:
+    - name: postgres
+      port: {{ .Values.service.port }}
+      targetPort: postgres

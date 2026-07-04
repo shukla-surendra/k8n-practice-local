@@ -1,0 +1,31 @@
+{{- if .Values.serviceAccount.create }}
+# Namespaced RBAC: lets the backend's own ServiceAccount read (not write)
+# ConfigMaps/Secrets in its namespace — e.g. for dynamic config reload.
+# Deliberately scoped to a Role, not a ClusterRole: this app has no business
+# reading resources outside its own namespace.
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role
+metadata:
+  name: {{ include "backend.fullname" . }}-config-reader
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+rules:
+  - apiGroups: [""]
+    resources: ["configmaps", "secrets"]
+    verbs: ["get", "list", "watch"]
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding
+metadata:
+  name: {{ include "backend.fullname" . }}-config-reader
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+roleRef:
+  apiGroup: rbac.authorization.k8s.io
+  kind: Role
+  name: {{ include "backend.fullname" . }}-config-reader
+subjects:
+  - kind: ServiceAccount
+    name: {{ include "backend.serviceAccountName" . }}
+    namespace: {{ .Release.Namespace }}
+{{- end }}

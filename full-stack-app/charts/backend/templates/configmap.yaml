@@ -1,0 +1,18 @@
+# Non-secret config for the backend. A real API would read these env vars
+# to build its DB connection string; http-echo ignores them, but they're
+# here to demonstrate wiring a ConfigMap into a Deployment via envFrom.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ include "backend.fullname" . }}-config
+  labels:
+    {{- include "backend.labels" . | nindent 4 }}
+data:
+  # The database subchart's headless Service is always named "<release>-database"
+  # regardless of what's in values — same-namespace pods can resolve it by
+  # that short name via cluster DNS, so we compute it rather than trust a
+  # value that could drift out of sync with the actual Service name.
+  DB_HOST: {{ .Values.database.host | default (printf "%s-database" .Release.Name) | quote }}
+  DB_PORT: {{ .Values.database.port | quote }}
+  DB_NAME: {{ .Values.database.name | quote }}
+  DB_USER: {{ .Values.database.user | quote }}

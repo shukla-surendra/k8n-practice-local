@@ -1,0 +1,6 @@
+apiVersion: v2
+name: backend
+description: JSON API backend for the full-stack-app demo (hashicorp/http-echo)
+type: application
+version: 1.0.0
+appVersion: "1.0"

@@ -1,0 +1,23 @@
+full-stack-app has been deployed as release "{{ .Release.Name }}" in namespace "{{ .Release.Namespace }}" (revision {{ .Release.Revision }}).
+
+Check everything came up:
+  kubectl get all,ingress,configmap,secret,pdb,networkpolicy,resourcequota,limitrange -n {{ .Release.Namespace }} -l app.kubernetes.io/part-of=full-stack-app
+
+Run the built-in smoke test:
+  helm test {{ .Release.Name }} -n {{ .Release.Namespace }}
+
+Quick access without Ingress:
+  kubectl port-forward -n {{ .Release.Namespace }} svc/{{ .Release.Name }}-frontend 8080:{{ .Values.frontend.service.port }}
+  open http://localhost:8080
+
+{{- if .Values.ingress.enabled }}
+
+Access via Ingress:
+  echo "$(minikube ip) {{ .Values.ingress.host }}" | sudo tee -a /etc/hosts
+  curl http://{{ .Values.ingress.host }}/
+  curl http://{{ .Values.ingress.host }}{{ .Values.frontend.apiPath }}/
+{{- end }}
+
+See the chart README.md for the full manifest inventory and a step-by-step
+minikube walkthrough (autoscaling, PodDisruptionBudget, NetworkPolicy,
+RBAC, the migration Job, and the backup CronJob).

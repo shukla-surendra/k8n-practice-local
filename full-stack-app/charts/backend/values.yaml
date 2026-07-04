@@ -1,0 +1,42 @@
+# Defaults for the backend subchart.
+# When installed as part of the full-stack-app umbrella chart, these are
+# overridden by the "backend:" section of the parent's values.yaml.
+
+replicaCount: 2
+
+image:
+  repository: hashicorp/http-echo
+  tag: "1.0"
+  pullPolicy: IfNotPresent
+
+service:
+  port: 5678
+
+resources:
+  requests:
+    cpu: 25m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+autoscaling:
+  enabled: true
+  minReplicas: 2
+  maxReplicas: 4
+  targetCPUPercent: 70
+
+podDisruptionBudget:
+  enabled: true
+  minAvailable: 1
+
+serviceAccount:
+  create: true
+  name: ""
+
+# database connection info this API would use to talk to the "database" subchart
+database:
+  host: "" # set from the umbrella chart, e.g. <release>-database
+  port: 5432
+  name: appdb
+  user: appuser
