@@ -1,0 +1,52 @@
+site_name: k8n-practice-local docs
+site_description: Kubernetes practice notes and install logs
+docs_dir: docs
+site_dir: site
+
+theme:
+  name: material
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/brightness-7
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/brightness-4
+        name: Switch to light mode
+  features:
+    - navigation.instant
+    - navigation.tracking
+    - navigation.sections
+    - navigation.expand
+    - content.code.copy
+    - search.suggest
+
+markdown_extensions:
+  - tables
+  - fenced_code
+  - toc:
+      permalink: true
+
+nav:
+  - Home: README.md
+  - Basics:
+      - Kubernetes Fundamentals: kubernetes-fundamentals.md
+      - Cluster Architecture: cluster-architecture.md
+      - ConfigMaps & Secrets: configmaps-and-secrets.md
+      - Storage & Persistence: storage-and-persistence.md
+  - Networking & Access:
+      - Accessing Pods & Services: accessing-pods-and-services.md
+      - Multiple Services, Same Port: multiple-services-same-port.md
+      - Network Policies: network-policies.md
+  - Workloads & Reliability:
+      - Workload Types: workload-types.md
+      - Probes & Health Checks: probes-and-health-checks.md
+      - Resource Management: resource-management.md
+  - Security:
+      - RBAC: rbac.md
+  - Advanced:
+      - CRDs & Operators: crds-and-operators.md
+      - Helm vs Kustomize: helm-vs-kustomize.md
