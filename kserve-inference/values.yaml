@@ -1,0 +1,60 @@
+# values.yaml — defaults for the InferenceService this chart creates.
+# Prerequisite: KServe must already be installed on the cluster
+# (this chart only creates the InferenceService custom resource, not KServe itself).
+
+# Name of the InferenceService. Defaults to the release name if left blank.
+nameOverride: ""
+
+# Extra labels/annotations on the InferenceService metadata.
+# Common KServe annotations you might add here:
+#   serving.kserve.io/deploymentMode: "Serverless"   # or "RawDeployment"
+#   sidecar.istio.io/inject: "true"
+annotations: {}
+labels: {}
+
+predictor:
+  # Autoscaling bounds. minReplicas: 0 lets Knative scale the predictor to
+  # zero when idle (Serverless mode only).
+  minReplicas: 1
+  maxReplicas: 3
+
+  # scaleMetric: "concurrency" (default) or "rps"
+  # scaleTarget: the value of that metric to scale on, e.g. 5 concurrent requests/pod
+  scaleMetric: concurrency
+  scaleTarget: 5
+
+  # ServiceAccount used to read model artifacts from private storage
+  # (e.g. one annotated with cloud credentials for S3/GCS).
+  serviceAccountName: ""
+
+  # The model to serve. modelFormat must match a ServingRuntime already
+  # registered in the cluster (sklearn, xgboost, tensorflow, pytorch, onnx, ...).
+  model:
+    modelFormat: sklearn
+    # Pin a specific runtime version, or leave blank to use the ServingRuntime default.
+    runtimeVersion: ""
+    # Name a specific ServingRuntime to use instead of auto-selecting by modelFormat.
+    runtime: ""
+    # Where the model artifacts live. Supports gs://, s3://, pvc://, http(s)://, etc.
+    storageUri: "gs://kfserving-examples/models/sklearn/1.0/model"
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: "1"
+      memory: 1Gi
+
+# Optional pre/post-processing container that sits in front of the predictor.
+# Requests flow: client -> transformer -> predictor.
+transformer:
+  enabled: false
+  image: ""
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi

@@ -1,0 +1,50 @@
+# InferenceService — the core KServe custom resource. KServe's controller
+# reads this and creates the underlying Knative Service / Deployment,
+# Service, and (in Serverless mode) the autoscaling + scale-to-zero wiring.
+apiVersion: serving.kserve.io/v1beta1
+kind: InferenceService
+metadata:
+  name: {{ include "kserve-inference.fullname" . }}
+  labels:
+    {{- include "kserve-inference.labels" . | nindent 4 }}
+  {{- with .Values.annotations }}
+  annotations:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+spec:
+  predictor:
+    {{- if hasKey .Values.predictor "minReplicas" }}
+    minReplicas: {{ .Values.predictor.minReplicas }}
+    {{- end }}
+    {{- with .Values.predictor.maxReplicas }}
+    maxReplicas: {{ . }}
+    {{- end }}
+    {{- with .Values.predictor.scaleMetric }}
+    scaleMetric: {{ . }}
+    {{- end }}
+    {{- with .Values.predictor.scaleTarget }}
+    scaleTarget: {{ . }}
+    {{- end }}
+    {{- with .Values.predictor.serviceAccountName }}
+    serviceAccountName: {{ . }}
+    {{- end }}
+    model:
+      modelFormat:
+        name: {{ .Values.predictor.model.modelFormat }}
+      {{- with .Values.predictor.model.runtimeVersion }}
+      runtimeVersion: {{ . | quote }}
+      {{- end }}
+      {{- with .Values.predictor.model.runtime }}
+      runtime: {{ . }}
+      {{- end }}
+      storageUri: {{ .Values.predictor.model.storageUri | quote }}
+      resources:
+        {{- toYaml .Values.predictor.resources | nindent 8 }}
+  {{- if .Values.transformer.enabled }}
+  transformer:
+    containers:
+      - name: transformer
+        image: {{ required "transformer.image is required when transformer.enabled=true" .Values.transformer.image | quote }}
+        resources:
+          {{- toYaml .Values.transformer.resources | nindent 10 }}
+  {{- end }}

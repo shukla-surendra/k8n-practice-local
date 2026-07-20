@@ -1,0 +1,17 @@
+InferenceService "{{ include "kserve-inference.fullname" . }}" has been created in namespace "{{ .Release.Namespace }}".
+
+1. Watch it come up (READY becomes True once the predictor pod is running):
+
+   kubectl get inferenceservice {{ include "kserve-inference.fullname" . }} -n {{ .Release.Namespace }} -w
+
+2. Get the URL KServe assigned:
+
+   kubectl get inferenceservice {{ include "kserve-inference.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.status.url}'
+
+3. Send a test request (cluster-local, via port-forward to the ingress/knative gateway,
+   or through the URL above if you have external DNS set up). Example payload shape
+   depends on modelFormat — for the default sklearn iris example:
+
+   curl -H "Content-Type: application/json" \
+        -d '{"instances": [[6.8, 2.8, 4.8, 1.4]]}' \
+        <PREDICTOR_URL>/v1/models/{{ include "kserve-inference.fullname" . }}:predict
