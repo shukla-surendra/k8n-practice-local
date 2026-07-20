@@ -46,6 +46,14 @@ browsable site (search, dark mode).
 - [`helm-vs-kustomize.md`](./helm-vs-kustomize.md) — templating + release tracking vs.
   overlay/patch on plain YAML, and why this repo uses both.
 
+## Cloud
+
+- [`eks-setup.md`](./eks-setup.md) — standing up and running Amazon EKS end to end: networking
+  prerequisites, `eksctl` cluster creation, IRSA, the AWS Load Balancer Controller, EBS/EFS
+  storage, node/pod autoscaling, observability, and cleanup/cost control. Reference tutorial,
+  not verified live like the rest of this folder — no AWS account/credentials in this
+  environment.
+
 ## Install logs
 
 For what broke and how it was fixed installing specific components on this cluster, see the

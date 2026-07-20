@@ -50,3 +50,5 @@ nav:
   - Advanced:
       - CRDs & Operators: crds-and-operators.md
       - Helm vs Kustomize: helm-vs-kustomize.md
+  - Cloud:
+      - EKS Setup: eks-setup.md
