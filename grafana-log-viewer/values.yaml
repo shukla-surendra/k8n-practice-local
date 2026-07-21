@@ -23,6 +23,14 @@ loki-stack:
         memory: 64Mi
       limits:
         memory: 128Mi
+    # loki-stack's own default is `http://{{ .Release.Name }}:3100/loki/api/v1/push`,
+    # which only resolves if the release is literally named "loki" — the Loki Service
+    # this chart creates is actually named `<release>-loki`. With release name
+    # "log-viewer" that default pushes to a nonexistent "log-viewer" host and silently
+    # drops every log line (see docs/incidents.md, 2026-07-21). Pin it explicitly.
+    config:
+      clients:
+        - url: http://log-viewer-loki:3100/loki/api/v1/push
 
   grafana:
     enabled: true
@@ -30,6 +38,12 @@ loki-stack:
     sidecar:
       datasources:
         enabled: true
+      # Watches for ConfigMaps labeled grafana_dashboard=1 in this namespace and
+      # auto-loads them — see templates/dashboard-nginx-logs.yaml in this chart.
+      dashboards:
+        enabled: true
+        label: grafana_dashboard
+        labelValue: "1"
     service:
       type: NodePort
     resources:

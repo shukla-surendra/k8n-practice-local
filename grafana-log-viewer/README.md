@@ -15,6 +15,12 @@ tuned for a local practice cluster.
   for why that matters on this cluster)
 - **Release name:** `log-viewer`
 - **Method:** local chart wrapping `grafana/loki-stack` (Helm), not raw manifests/kustomize
+- **Status:** installed, healthy, and actually shipping logs (verified via `sample-nginx` —
+  `{app="nginx"}` returns real results in Explore) — getting there took a CPU-scheduling fix,
+  a stuck `StatefulSet` revision, a transient Loki readiness `503`, and a broken default
+  Promtail→Loki URL that silently dropped every log line until fixed; full
+  writeup in
+  [`docs/incidents.md`](../docs/incidents.md#2026-07-21-grafana-log-viewer-stuck-pending-insufficient-cpu)
 
 ## Values files
 
@@ -105,7 +111,16 @@ so logs are queryable immediately.
 
 ## View logs
 
-In Grafana, go to **Explore**, pick the **Loki** datasource, and query by
+**Dashboard** (no query typing needed): **Dashboards** → **App Logs (sample-nginx)** —
+auto-provisioned by `templates/dashboard-nginx-logs.yaml`, a Logs panel already pinned to
+`{app="nginx"}`. Loaded via Grafana's dashboard sidecar
+(`grafana.sidecar.dashboards.enabled: true`), which watches this namespace for ConfigMaps
+labeled `grafana_dashboard: "1"` — that's how `templates/dashboard-nginx-logs.yaml` gets
+picked up automatically on every install/upgrade, no manual import. Full mechanism (how the
+sidecar actually gets a ConfigMap onto Grafana's disk, and how to add more dashboards) in
+[`docs/grafana-dashboard-provisioning.md`](../docs/grafana-dashboard-provisioning.md).
+
+**Explore** (ad-hoc queries): go to **Explore**, pick the **Loki** datasource, and query by
 namespace/pod/container label, e.g.:
 
 ```
