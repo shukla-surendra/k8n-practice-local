@@ -25,6 +25,11 @@ resources:
 - No `requests`/`limits` at all means "unbounded" — the Pod can be scheduled anywhere and use as
   much as the node has free, which is how one runaway Pod starves its neighbors. This is
   precisely the gap `LimitRange` closes.
+- **Sharp edge**: setting `limits.cpu` without `requests.cpu` does not leave the request unset —
+  the API server defaults the request to equal the limit. To make a container genuinely
+  CPU-request-free, `cpu` has to be absent from both `requests` and `limits`. See
+  [`incidents.md`](./incidents.md#2026-07-21-grafana-log-viewer-stuck-pending-insufficient-cpu)
+  for a case where this silently defeated an attempted fix.
 
 ## LimitRange — namespace-wide defaults
 

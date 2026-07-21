@@ -35,6 +35,7 @@ nav:
   - Basics:
       - Kubernetes Fundamentals: kubernetes-fundamentals.md
       - Cluster Architecture: cluster-architecture.md
+      - Local Cluster Setup: local-cluster-setup.md
       - ConfigMaps & Secrets: configmaps-and-secrets.md
       - Storage & Persistence: storage-and-persistence.md
   - Networking & Access:
@@ -50,5 +51,7 @@ nav:
   - Advanced:
       - CRDs & Operators: crds-and-operators.md
       - Helm vs Kustomize: helm-vs-kustomize.md
+      - Cluster Inventory & Cleanup: cluster-inventory-and-cleanup.md
   - Cloud:
       - EKS Setup: eks-setup.md
+  - Incident Log: incidents.md

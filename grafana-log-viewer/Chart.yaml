@@ -1,0 +1,16 @@
+apiVersion: v2
+name: grafana-log-viewer
+description: Cluster-wide log viewing stack (Loki + Promtail + Grafana) for viewing pod logs from all namespaces
+type: application
+version: 1.0.0
+appVersion: "2.9.3"
+keywords:
+  - grafana
+  - loki
+  - promtail
+  - logging
+  - observability
+dependencies:
+  - name: loki-stack
+    version: "2.10.3"
+    repository: "https://grafana.github.io/helm-charts"

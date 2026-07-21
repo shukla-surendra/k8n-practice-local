@@ -1,0 +1,48 @@
+# Default values — memory-bounded, CPU-unbounded. This is the profile that actually
+# schedules on this repo's `minikube` cluster, whose node has zero free CPU already
+# claimed by the existing Kubeflow/Istio/Knative stack (see docs/incidents.md,
+# 2026-07-21). For a cluster with real CPU headroom, layer values-with-cpu-limits.yaml
+# on top (see README.md) rather than editing this file.
+loki-stack:
+  loki:
+    enabled: true
+    isDefault: true
+    persistence:
+      enabled: false
+    resources:
+      requests:
+        memory: 128Mi
+      limits:
+        memory: 256Mi
+
+  # DaemonSet: one pod per node, tails container logs from every namespace
+  promtail:
+    enabled: true
+    resources:
+      requests:
+        memory: 64Mi
+      limits:
+        memory: 128Mi
+
+  grafana:
+    enabled: true
+    adminPassword: admin
+    sidecar:
+      datasources:
+        enabled: true
+    service:
+      type: NodePort
+    resources:
+      requests:
+        memory: 128Mi
+      limits:
+        memory: 256Mi
+
+  fluent-bit:
+    enabled: false
+  prometheus:
+    enabled: false
+  filebeat:
+    enabled: false
+  logstash:
+    enabled: false

@@ -1,5 +1,5 @@
 ```
-kubectl apply -f nginx-deploy.yaml
+kubectl apply -f nginx-deployment.yaml
 ```
 
 ```
@@ -16,6 +16,32 @@ kubectl scale deployment nginx-deployment --replicas=2
 
 ```
 kubectl describe service nginx-deployment
+```
+
+## Enable ingress
+
+```
+minikube addons enable ingress
+```
+
+```
+kubectl apply -f ingress.yaml
+```
+
+Add the minikube IP to /etc/hosts so the host rule resolves:
+
+```
+echo "$(minikube ip) sample-nginx.local" | sudo tee -a /etc/hosts
+```
+
+```
+curl http://sample-nginx.local
+```
+
+## Cleanup
+
+```
+kubectl delete -f ingress.yaml
 ```
 
 ```

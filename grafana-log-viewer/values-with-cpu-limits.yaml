@@ -1,0 +1,32 @@
+# Overlay: adds explicit CPU requests + limits on top of values.yaml's memory-only
+# defaults. Use on a cluster with real CPU headroom (not this repo's `minikube` profile
+# right now — see docs/incidents.md, 2026-07-21, for why CPU-bounded values got these
+# pods stuck Pending here).
+#
+# Deliberately sets BOTH requests and limits explicitly (Burstable QoS, requests <
+# limits) rather than only limits — a limits-only container has its request silently
+# defaulted to equal the limit by the API server, which produces a full-limit
+# reservation while looking like a smaller one. See resource-management.md.
+#
+# Usage: helm install/upgrade ... -f values.yaml -f values-with-cpu-limits.yaml
+loki-stack:
+  loki:
+    resources:
+      requests:
+        cpu: 50m
+      limits:
+        cpu: 200m
+
+  promtail:
+    resources:
+      requests:
+        cpu: 50m
+      limits:
+        cpu: 100m
+
+  grafana:
+    resources:
+      requests:
+        cpu: 50m
+      limits:
+        cpu: 200m
